@@ -1,0 +1,76 @@
+$schema: https://azuremlschemas.azureedge.net/promptflow/latest/Flow.schema.json
+environment:
+  python_requirements_txt: requirements.txt
+inputs:
+  text:
+    type: string
+    default: "In AD 79 the city of Pompeii was covered in volcanic ash "
+outputs:
+  output_if_0:
+    type: string
+    reference: ${execute_if_0.output}
+  output_if_1:
+    type: string
+    reference: ${execute_if_1.output}
+  output_if_2:
+    type: string
+    reference: ${execute_if_2.output}
+  output_if_3:
+    type: string
+    reference: ${execute_if_3.output}
+nodes:
+- name: call_llm
+  type: llm
+  source:
+    type: code
+    path: call_llm.jinja2
+  inputs:
+    deployment_name: gpt-4o-deployment
+    response_format:
+      type: json_object
+    statement: ${inputs.text}
+  connection: dos-aoai-westus-connection
+  api: chat
+- name: parse_classification
+  type: python
+  source:
+    type: code
+    path: parse_classification.py
+  inputs:
+    input1: ${call_llm.output}
+- name: execute_if_0
+  type: python
+  source:
+    type: code
+    path: python_node_0.py
+  inputs: {}
+  activate:
+    when: ${parse_classification.output}
+    is: 0
+- name: execute_if_1
+  type: python
+  source:
+    type: code
+    path: python_node_1.py
+  inputs: {}
+  activate:
+    when: ${parse_classification.output}
+    is: 1
+- name: execute_if_2
+  type: python
+  source:
+    type: code
+    path: python_node_2.py
+  inputs: {}
+  activate:
+    when: ${parse_classification.output}
+    is: 2
+- name: execute_if_3
+  type: python
+  source:
+    type: code
+    path: python_node_3.py
+  inputs: {}
+  activate:
+    when: ${parse_classification.output}
+    is: 3

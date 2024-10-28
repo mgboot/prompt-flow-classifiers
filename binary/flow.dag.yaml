@@ -1,0 +1,52 @@
+$schema: https://azuremlschemas.azureedge.net/promptflow/latest/Flow.schema.json
+environment:
+  python_requirements_txt: requirements.txt
+inputs:
+  text:
+    type: string
+    default: I would like to sign up for swimming lessons
+outputs:
+  output_if_true:
+    type: string
+    reference: ${execute_if_true.output}
+  output_if_false:
+    type: string
+    reference: ${execute_if_false.output}
+nodes:
+- name: execute_if_true
+  type: python
+  source:
+    type: code
+    path: python_node_true.py
+  inputs: {}
+  activate:
+    when: ${parse_classification.output}
+    is: true
+- name: execute_if_false
+  type: python
+  source:
+    type: code
+    path: python_node_false.py
+  inputs: {}
+  activate:
+    when: ${parse_classification.output}
+    is: false
+- name: call_llm
+  type: llm
+  source:
+    type: code
+    path: call_llm.jinja2
+  inputs:
+    deployment_name: gpt-4o-deployment
+    response_format:
+      type: json_object
+    statement: ${inputs.text}
+  connection: dos-aoai-westus-connection
+  api: chat
+- name: parse_classification
+  type: python
+  source:
+    type: code
+    path: parse_classification.py
+  inputs:
+    input1: ${call_llm.output}

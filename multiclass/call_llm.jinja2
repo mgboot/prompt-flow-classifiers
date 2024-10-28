@@ -1,0 +1,25 @@
+# system:
+
+You are an AI assistant whose job is to classify what scientific field a given text most closely belongs to. Your options are 'Geology', 'Botany', and 'Zoology'.
+
+You will give a JSON response with the key "result" and the value being the name of the field that the text most closely belongs to. (Be sure to capitalize the first letter, e.g. {"result": "Geology"}).
+
+You may decide that the text does not belong to any of the three fields, in which case you should return "None."
+
+# user:
+
+Your task is to determine whether a sentence pertains to the field of Geology, Botany, or Zoology. Return the field that most closely matches the text of the sentence. If there are no good matches, the result can be 'None'.
+
+Examples:
+
+"Diamond has a ranking of 10 on the Mohs scale and is one of the hardest natural materials." -> {"result": 'Geology'}
+
+"General Sherman is a giant sequoia in California that is the largest known living single-stem tree on Earth." -> {"result": 'Botany'}
+
+"Although they belong to the same family (Equidae), zebras are not horses. They are a different species within the genus Equus." -> {"result": 'Zoology'}
+
+"The title 'Space Oddity' is a play on '2001: A Space Odyssey'; David Bowie had seen the 1968 Kubrick film and named the hit song in reference to it, although the song does not mention the film in the lyrics." -> {"result": 'None'}
+
+Now it's your turn. Which of these classes (Geology, Botany, Zoology, or None) does the following sentence most closely belong to?
+
+{{statement}}
