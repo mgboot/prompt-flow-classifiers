@@ -1,0 +1,106 @@
+$schema: https://azuremlschemas.azureedge.net/promptflow/latest/Flow.schema.json
+environment:
+  python_requirements_txt: requirements.txt
+inputs:
+  text:
+    type: string
+    default: In AD 79, Mount Vesuvius erupted, spewing volcanic ash all around at a
+      great radius. This had a devastating effect on the local wildlife, and
+      many animals were instantly kiled (not to mention humans)
+outputs:
+  output_if_0:
+    type: string
+    reference: ${execute_if_0.output}
+  output_if_1:
+    type: string
+    reference: ${execute_if_1.output}
+  output_if_2:
+    type: string
+    reference: ${execute_if_2.output}
+  output_if_3:
+    type: string
+    reference: ${execute_if_3.output}
+nodes:
+- name: call_llm
+  type: llm
+  source:
+    type: code
+    path: call_llm.jinja2
+  inputs:
+    deployment_name: gpt-4o-deployment
+    response_format:
+      type: json_object
+    statement: ${inputs.text}
+  connection: dos-aoai-westus-connection
+  api: chat
+- name: parse_classification
+  type: python
+  source:
+    type: code
+    path: parse_classification.py
+  inputs:
+    input1: ${call_llm.output}
+- name: execute_if_0
+  type: python
+  source:
+    type: code
+    path: python_node_0.py
+  inputs: {}
+  activate:
+    when: ${check_for_0.output}
+    is: true
+- name: execute_if_1
+  type: python
+  source:
+    type: code
+    path: python_node_1.py
+  inputs: {}
+  activate:
+    when: ${check_for_1.output}
+    is: true
+- name: execute_if_2
+  type: python
+  source:
+    type: code
+    path: python_node_2.py
+  inputs: {}
+  activate:
+    when: ${check_for_2.output}
+    is: true
+- name: execute_if_3
+  type: python
+  source:
+    type: code
+    path: python_node_3.py
+  inputs: {}
+  activate:
+    when: ${check_for_none.output}
+    is: true
+- name: check_for_0
+  type: python
+  source:
+    type: code
+    path: check_for_0.py
+  inputs:
+    input1: ${parse_classification.output}
+- name: check_for_1
+  type: python
+  source:
+    type: code
+    path: check_for_1.py
+  inputs:
+    input1: ${parse_classification.output}
+- name: check_for_2
+  type: python
+  source:
+    type: code
+    path: check_for_2.py
+  inputs:
+    input1: ${parse_classification.output}
+- name: check_for_none
+  type: python
+  source:
+    type: code
+    path: check_for_3.py
+  inputs:
+    input1: ${parse_classification.output}
